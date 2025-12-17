@@ -17,7 +17,9 @@ const Index = () => {
   }, []);
 
   const handleSubmit = () => {
-    if (!apiKey) return;
+    if (!apiKey) {
+      return;
+    }
     localStorage.setItem(OPENAI_API_KEY, apiKey);
     router.push('/home/text');
   };
