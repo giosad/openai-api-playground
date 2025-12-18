@@ -5,9 +5,10 @@ import { HTMLAttributeAnchorTarget, PropsWithChildren, useEffect } from 'react';
 import { OpenAISVG, GithubSVG } from '@/components/svgs';
 import { Button, Link, Text } from '@/components/ui';
 import { OPENAI_API_KEY } from '@/lib/constants';
-import openai from '@/lib/openai';
+import openai, { isProxyEnabled, configureOpenAI } from '@/lib/openai';
 import { ArrowUpRight } from 'lucide-react';
 import { ModeToggle } from '@/components/mode-toggle';
+import { ProxyToggle } from '@/components/proxy-toggle';
 
 type Menu = { name: string; path: string; target?: HTMLAttributeAnchorTarget };
 
@@ -67,6 +68,7 @@ const Navbar = () => {
         >
           API Reference <ArrowUpRight size={16} />
         </Link>
+        <ProxyToggle />
         <ModeToggle />
         <Link
           href="https://github.com/hkurma/openai-playground-plus"
@@ -83,6 +85,13 @@ const HomeLayout = (props: PropsWithChildren) => {
   const router = useRouter();
 
   useEffect(() => {
+    // Configure OpenAI client based on mode
+    configureOpenAI();
+
+    // When using proxy, API key is handled server-side - no localStorage check needed
+    if (isProxyEnabled()) return;
+
+    // Direct mode: require API key from localStorage
     const apiKey = localStorage.getItem(OPENAI_API_KEY);
     if (!apiKey) router.push('/');
     else openai.apiKey = apiKey;

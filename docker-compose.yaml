@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    env_file:
+      - .env
     environment:
       # PUID/PGID: User and group IDs for the container user
       # Set these to match your host user/group IDs for proper file permissions
