@@ -1,0 +1,64 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+.yarn
+
+# Build outputs
+.next
+out
+build
+dist
+
+# Testing
+coverage
+
+# Development
+.env
+.env*.local
+.env.development
+.env.test
+
+# IDE and editors
+.vscode
+.idea
+*.swp
+*.swo
+.cursor
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose*.yaml
+docker-compose*.yml
+.dockerignore
+
+# Documentation
+README.md
+CLAUDE.md
+*.md
+
+# Misc
+.DS_Store
+*.pem
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Husky
+.husky
+
+# Vercel
+.vercel
+
+# Local config
+.eslintcache
+.prettierignore
+

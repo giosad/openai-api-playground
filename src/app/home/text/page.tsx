@@ -19,7 +19,7 @@ import { DEFAULT_SYSTEM_INSTRUCTIONS } from '@/lib/constants';
 import openai from '@/lib/openai';
 import { cn } from '@/lib/utils';
 import { ArrowUpRight, MessageSquare, Send, XCircle } from 'lucide-react';
-import { ChatCompletionMessageParam } from 'openai/resources/index.mjs';
+import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 import { useEffect, useRef, useState } from 'react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';

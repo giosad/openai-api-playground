@@ -25,7 +25,7 @@ import {
   Send,
   XCircle,
 } from 'lucide-react';
-import { ChatCompletionMessageParam } from 'openai/resources/index.mjs';
+import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 import { useEffect, useRef, useState } from 'react';
 
 const models = [
@@ -134,7 +134,7 @@ const Vision = () => {
     text,
     imageUrl,
   }: {
-    role: 'function' | 'assistant' | 'user' | 'system' | 'tool';
+    role: 'function' | 'assistant' | 'user' | 'system' | 'tool' | 'developer';
     text?: string;
     imageUrl?: string;
   }) => {
@@ -196,13 +196,15 @@ const Vision = () => {
                       text={content.text}
                     />
                   );
-                return (
-                  <MessageContent
-                    key={index}
-                    role={message.role}
-                    imageUrl={content.image_url.url}
-                  />
-                );
+                if (content.type == 'image_url')
+                  return (
+                    <MessageContent
+                      key={index}
+                      role={message.role}
+                      imageUrl={content.image_url.url}
+                    />
+                  );
+                return null;
               });
             })}
           {pendingCompletion && (

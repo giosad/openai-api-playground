@@ -366,20 +366,16 @@ const Images = () => {
                     />
                   )}
                   <div className="flex flex-col gap-1">
-                    <Text variant="small" className="text-muted-foreground">
-                      You:
-                    </Text>
+                    <Text variant="muted">You:</Text>
                     <Text>{message.userPrompt}</Text>
                   </div>
                 </div>
               ) : (
                 <div className="flex flex-col gap-2 p-3 border rounded-md bg-secondary max-w-[80%]">
                   <div className="flex items-center gap-2">
-                    <Text variant="small" className="text-muted-foreground">
-                      Generated:
-                    </Text>
+                    <Text variant="muted">Generated:</Text>
                     {message.generationTime && (
-                      <Text variant="small" className="text-muted-foreground">
+                      <Text variant="muted">
                         ({(message.generationTime / 1000).toFixed(2)}s)
                       </Text>
                     )}
@@ -410,14 +406,31 @@ const Images = () => {
                               height={256}
                               className="rounded border"
                             />
-                            <Button
-                              size="sm"
-                              variant="secondary"
-                              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                              onClick={() => handleUseImageForEdit(imgSrc)}
-                            >
-                              Use for edit
-                            </Button>
+                            <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button
+                                size="small"
+                                variant="secondary"
+                                onClick={() => {
+                                  const newWindow = window.open();
+                                  if (newWindow) {
+                                    newWindow.document.write(
+                                      `<img src="${imgSrc}" style="max-width:100%;height:auto;">`
+                                    );
+                                    newWindow.document.title =
+                                      'Generated Image';
+                                  }
+                                }}
+                              >
+                                Open
+                              </Button>
+                              <Button
+                                size="small"
+                                variant="secondary"
+                                onClick={() => handleUseImageForEdit(imgSrc)}
+                              >
+                                Edit
+                              </Button>
+                            </div>
                           </div>
                         );
                       })}
@@ -432,9 +445,7 @@ const Images = () => {
             <div className="flex justify-end">
               <div className="flex gap-2 items-center p-3 border rounded-md bg-secondary">
                 <LoadingSVG />
-                <Text variant="small" className="text-muted-foreground">
-                  Generating...
-                </Text>
+                <Text variant="muted">Generating...</Text>
               </div>
             </div>
           )}
@@ -459,7 +470,7 @@ const Images = () => {
                 className="rounded border"
               />
               <Button
-                size="sm"
+                size="small"
                 variant="destructive"
                 className="absolute top-2 right-2"
                 onClick={handleClearImage}
@@ -510,7 +521,7 @@ const Images = () => {
               }
             />
           </div>
-          <Text variant="small" className="text-muted-foreground">
+          <Text variant="muted">
             {editMode === 'last-result'
               ? 'Editing last result'
               : 'Editing original input'}

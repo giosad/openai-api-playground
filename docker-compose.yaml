@@ -1,0 +1,13 @@
+services:
+  openai-api-playground:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      # PUID/PGID: User and group IDs for the container user
+      # Set these to match your host user/group IDs for proper file permissions
+      # Check with: id -u (for PUID) and id -g (for PGID)
+      - PUID=1000 # nimbus-vm-admin
+      - PGID=1001
+    restart: unless-stopped
+

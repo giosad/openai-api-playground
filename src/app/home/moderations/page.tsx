@@ -16,7 +16,7 @@ import {
 import openai from '@/lib/openai';
 import { cn } from '@/lib/utils';
 import { ArrowUpRight, MessageSquare, Send } from 'lucide-react';
-import { Moderation } from 'openai/resources/moderations.mjs';
+import type { Moderation } from 'openai/resources/moderations';
 import { useState } from 'react';
 
 const models = [

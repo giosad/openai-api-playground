@@ -18,16 +18,17 @@ import openai from '@/lib/openai';
 import { cn } from '@/lib/utils';
 import {
   Eraser,
-  File,
   MessageSquare,
   PlayCircle,
   Plus,
   RotateCw,
 } from 'lucide-react';
-import { Assistant } from 'openai/resources/beta/assistants/assistants.mjs';
-import { MessageContentText } from 'openai/resources/beta/threads/messages/messages.mjs';
-import { Thread } from 'openai/resources/beta/threads/threads.mjs';
-import { FileObject } from 'openai/resources/files.mjs';
+import type {
+  Assistant,
+  AssistantTool,
+} from 'openai/resources/beta/assistants';
+import type { TextContentBlock } from 'openai/resources/beta/threads/messages';
+import type { Thread } from 'openai/resources/beta/threads/threads';
 import { useEffect, useRef, useState } from 'react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -49,13 +50,11 @@ const newAssistant: Partial<Assistant> = {
   instructions: '',
   model: '',
   tools: [],
-  file_ids: [],
 };
 
 const Assistants = () => {
   const [assistants, setAssistants] = useState<Partial<Assistant>[]>([]);
   const [activeAssistant, setActiveAssistant] = useState<Partial<Assistant>>();
-  const [files, setFiles] = useState<FileObject[]>([]);
   const [saving, setSaving] = useState<boolean>(false);
 
   const [inputMessage, setInputMessage] = useState<string>('');
@@ -65,7 +64,6 @@ const Assistants = () => {
 
   useEffect(() => {
     fetchAssistants();
-    fetchFiles();
   }, []);
 
   const fetchAssistants = () => {
@@ -76,50 +74,19 @@ const Assistants = () => {
     });
   };
 
-  const fetchFiles = () => {
-    openai.files.list().then((res) => {
-      setFiles(res.data);
-    });
-  };
-
   const handleToolChange = (
-    tool: 'function' | 'code_interpreter' | 'retrieval',
+    tool: 'function' | 'code_interpreter' | 'file_search',
     checked: boolean
   ) => {
     if (!activeAssistant || !activeAssistant.tools) return;
     const tools = [...activeAssistant.tools];
-    if (checked)
-      tools.push({ type: tool } as
-        | Assistant.CodeInterpreter
-        | Assistant.Retrieval
-        | Assistant.Function);
+    if (checked) tools.push({ type: tool } as AssistantTool);
     else
       tools.splice(
         tools.findIndex((t) => t.type === tool),
         1
       );
     setActiveAssistant({ ...activeAssistant, tools: tools });
-  };
-
-  const resolveFilename = (fileId: string) => {
-    return files.find((f) => f.id === fileId)?.filename;
-  };
-
-  const handleAddFile = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    createFile(file);
-  };
-
-  const createFile = (file: File) => {
-    if (!activeAssistant) return;
-    openai.files.create({ file: file, purpose: 'assistants' }).then((res) => {
-      setFiles([...files, res]);
-      setActiveAssistant({
-        ...activeAssistant,
-        file_ids: [...(activeAssistant.file_ids ?? []), res.id],
-      });
-    });
   };
 
   const handleSaveActiveAssistant = () => {
@@ -132,7 +99,6 @@ const Assistants = () => {
           instructions: activeAssistant.instructions,
           model: activeAssistant.model as string,
           tools: activeAssistant.tools,
-          file_ids: activeAssistant.file_ids,
         })
         .then(() => {
           fetchAssistants();
@@ -147,7 +113,6 @@ const Assistants = () => {
           instructions: activeAssistant.instructions,
           model: activeAssistant.model,
           tools: activeAssistant.tools,
-          file_ids: activeAssistant.file_ids,
         })
         .then(() => {
           fetchAssistants();
@@ -159,7 +124,7 @@ const Assistants = () => {
 
   const handleDeleteActiveAssistant = () => {
     if (!activeAssistant?.id) return;
-    openai.beta.assistants.del(activeAssistant.id).then(() => {
+    openai.beta.assistants.delete(activeAssistant.id).then(() => {
       fetchAssistants();
     });
   };
@@ -212,7 +177,7 @@ const Assistants = () => {
 
   const checkRunStatus = (runId: string) => {
     openai.beta.threads.runs
-      .retrieve(thread?.id as string, runId)
+      .retrieve(runId, { thread_id: thread?.id as string })
       .then((res) => {
         if (res.status === 'completed') retrieveMessages();
         else setTimeout(() => checkRunStatus(runId), 1000);
@@ -225,7 +190,7 @@ const Assistants = () => {
         res.data
           .map((m) => ({
             role: m.role,
-            content: (m.content[0] as MessageContentText).text.value,
+            content: (m.content[0] as TextContentBlock).text.value,
           }))
           .reverse()
       );
@@ -352,46 +317,18 @@ const Assistants = () => {
                 />
               </div>
               <div className="flex justify-between items-center">
-                <Label>Retrieval</Label>
+                <Label>File Search</Label>
                 <Switch
-                  name="retrieval"
+                  name="file_search"
                   checked={activeAssistant?.tools?.some(
-                    (t) => t.type === 'retrieval'
+                    (t) => t.type === 'file_search'
                   )}
                   onCheckedChange={(checked) =>
-                    handleToolChange('retrieval', checked)
+                    handleToolChange('file_search', checked)
                   }
                 />
               </div>
             </div>
-          </div>
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <Text variant="muted">Files</Text>
-              <Label htmlFor="addFile" className="flex cursor-pointer px-2">
-                <Plus size={14} className="mr-1" />
-                Add
-                <Input
-                  id="addFile"
-                  name="addFile"
-                  type="file"
-                  className="hidden"
-                  onChange={handleAddFile}
-                />
-              </Label>
-            </div>
-            <hr />
-            {activeAssistant?.file_ids?.length === 0 && (
-              <Text variant="muted">
-                Add files to use with code interpreter or retrieval.
-              </Text>
-            )}
-            {activeAssistant?.file_ids?.map((fileId, index) => (
-              <div key={index} className="flex gap-1">
-                <File size={16} />
-                <Text>{resolveFilename(fileId)}</Text>
-              </div>
-            ))}
           </div>
         </div>
         {activeAssistant && (
