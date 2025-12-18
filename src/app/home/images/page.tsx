@@ -15,7 +15,15 @@ import {
   Text,
 } from '@/components/ui';
 import openai from '@/lib/openai';
-import { ArrowUpRight, MessageSquare, Send, XCircle } from 'lucide-react';
+import {
+  ArrowUpRight,
+  Download,
+  ExternalLink,
+  MessageSquare,
+  Pencil,
+  Send,
+  XCircle,
+} from 'lucide-react';
 import Image from 'next/image';
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -406,31 +414,51 @@ const Images = () => {
                               height={256}
                               className="rounded border"
                             />
-                            <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Button
-                                size="small"
-                                variant="secondary"
-                                onClick={() => {
-                                  const newWindow = window.open();
-                                  if (newWindow) {
-                                    newWindow.document.write(
-                                      `<img src="${imgSrc}" style="max-width:100%;height:auto;">`
-                                    );
-                                    newWindow.document.title =
-                                      'Generated Image';
-                                  }
-                                }}
-                              >
-                                Open
-                              </Button>
-                              <Button
-                                size="small"
-                                variant="secondary"
-                                onClick={() => handleUseImageForEdit(imgSrc)}
-                              >
-                                Edit
-                              </Button>
-                            </div>
+                            {/* Edit button - top left */}
+                            <Button
+                              size="small"
+                              variant="secondary"
+                              className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0"
+                              onClick={() => handleUseImageForEdit(imgSrc)}
+                              title="Edit image"
+                            >
+                              <Pencil size={16} />
+                            </Button>
+                            {/* Open button - top right */}
+                            <Button
+                              size="small"
+                              variant="secondary"
+                              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0"
+                              onClick={() => {
+                                const newWindow = window.open();
+                                if (newWindow) {
+                                  newWindow.document.write(
+                                    `<img src="${imgSrc}" style="max-width:100%;height:auto;">`
+                                  );
+                                  newWindow.document.title = 'Generated Image';
+                                }
+                              }}
+                              title="Open in new tab"
+                            >
+                              <ExternalLink size={16} />
+                            </Button>
+                            {/* Download button - bottom right */}
+                            <Button
+                              size="small"
+                              variant="secondary"
+                              className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0"
+                              onClick={() => {
+                                const link = document.createElement('a');
+                                link.href = imgSrc;
+                                link.download = `generated-${Date.now()}-${idx}.png`;
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                              }}
+                              title="Download image"
+                            >
+                              <Download size={16} />
+                            </Button>
                           </div>
                         );
                       })}
