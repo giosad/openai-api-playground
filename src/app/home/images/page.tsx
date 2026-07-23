@@ -29,6 +29,7 @@ import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 const models = [
+  { name: 'gpt-image-2' },
   { name: 'gpt-image-1.5' },
   { name: 'gpt-image-1' },
   { name: 'gpt-image-1-mini' },
@@ -72,7 +73,7 @@ const Images = () => {
     style: string;
     size: string;
   }>({
-    model: 'gpt-image-1.5',
+    model: 'gpt-image-2',
     count: 1,
     style: 'vivid',
     size: 'auto',
@@ -630,6 +631,22 @@ const Images = () => {
                   <SelectItem value="1024x1536">
                     1024x1536 (portrait)
                   </SelectItem>
+                  {options.model === 'gpt-image-2' && (
+                    <>
+                      <SelectItem value="2048x2048">
+                        2048x2048 (2K square)
+                      </SelectItem>
+                      <SelectItem value="2048x1152">
+                        2048x1152 (landscape)
+                      </SelectItem>
+                      <SelectItem value="3840x2160">
+                        3840x2160 (landscape)
+                      </SelectItem>
+                      <SelectItem value="2160x3840">
+                        2160x3840 (portrait)
+                      </SelectItem>
+                    </>
+                  )}
                 </>
               )}
               {/* DALL-E 2 sizes */}

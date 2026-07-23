@@ -57,6 +57,10 @@ npm run lint-staged      # Run lint-staged (used by Husky pre-commit hook)
 The images page (`src/app/home/images/page.tsx`) supports both generation and editing:
 
 **Model Support**:
+- **GPT Image 2** (`gpt-image-2`):
+  - Sizes: same as below, plus `2048x2048`, `2048x1152`, `3840x2160`, `2160x3840`
+  - Image edit: requires image as **array** (even for single image)
+  - No style parameter support
 - **GPT Image models** (`gpt-image-1.5`, `gpt-image-1`, `gpt-image-1-mini`, `chatgpt-image-latest`):
   - Sizes: `auto`, `1024x1024`, `1536x1024`, `1024x1536`
   - Image edit: requires image as **array** (even for single image)
